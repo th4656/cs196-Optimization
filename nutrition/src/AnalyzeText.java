@@ -11,29 +11,26 @@ import net.java.frej.fuzzy.Fuzzy;
 public class AnalyzeText {
 	public static TreeMap<String, String[]> nutritionDetails(String s){
 		
-		int count = 0;
-		
-        TreeMap<String, String[]> t = new TreeMap<String, String[]>();
+        TreeMap<String, String[]> t = new TreeMap<String, String[]>();     		//Creating treemap that will hold all values for organic quantities
         
-        TextIO.readFile(s);
+        TextIO.readFile(s);    													//read in the text file.
         
-        while(!TextIO.eof()) {
-        	count++;
-            String data = "";
-            ArrayList<String> quantity = new ArrayList<String>();
+        while(!TextIO.eof()) {    												//loop through the text file.
+            String data = "";       											// will be the key for the map
+            ArrayList<String> quantity = new ArrayList<String>();				//array list to hold quantities
             
-            String tempLine = TextIO.getln();
+            String tempLine = TextIO.getln();									//read in the current line of the text file	
             
-            Pattern percentQuantities = Pattern.compile("\\d+%");
+            Pattern percentQuantities = Pattern.compile("\\d+%");				//regex to search for all numbers followed by a %
             Matcher percentMatcher = percentQuantities.matcher(tempLine);
             
-            Pattern gramsQuantity = Pattern.compile("\\d+(g|mg)");
+            Pattern gramsQuantity = Pattern.compile("\\d+(g|mg)");				//regex to search for all numbers followed by a g or mg
             Matcher gramsMatcher = gramsQuantity.matcher(tempLine);
             
-            Pattern calorieCounter = Pattern.compile("Cal.*\\s\\d+");
+            Pattern calorieCounter = Pattern.compile("Cal.*\\s\\d+");			// regex to search for calories
             Matcher calorieMatcher = calorieCounter.matcher(tempLine);
             
-            while (percentMatcher.find()) {
+            while (percentMatcher.find()) {										//add the values found by regex into the array list
             	quantity.add(percentMatcher.group());
             }
             
@@ -42,10 +39,11 @@ public class AnalyzeText {
             }
             
             while(calorieMatcher.find()) {
-            	quantity.add(calorieMatcher.group());
+            	String temp = calorieMatcher.group().substring(9);
+            	quantity.add(temp);
             }
            
-            String[] quantityArray = new String[quantity.size()];
+            String[] quantityArray = new String[quantity.size()];				//convert array list to an array
             for(int i= 0; i < quantityArray.length; i ++) {
             	quantityArray[i] = quantity.get(i);
             }
@@ -56,34 +54,48 @@ public class AnalyzeText {
             
         	if(Fuzzy.containsOneOf(tempLine, "Calorie")) {
         		data = "Calorie";
-        	} else if (Fuzzy.containsOneOf(tempLine, "Protein")){
+        	} 
+        	if (Fuzzy.containsOneOf(tempLine, "Protein")){
         		data = "Protein";
-        	} else if (Fuzzy.containsOneOf(tempLine, "Total Fat")){
+        	} 
+        	if (Fuzzy.containsOneOf(tempLine, "Total Fat")){
         		data = "Total Fat";
-        	} else if (Fuzzy.containsOneOf(tempLine, "Carbs") || Fuzzy.containsOneOf(tempLine, "Carbohydrates")){
+        	} 
+        	if (Fuzzy.containsOneOf(tempLine, "Carbs") || Fuzzy.containsOneOf(tempLine, "Carbohydrates")){
         		data = "Carbs";
-        	} else if (Fuzzy.containsOneOf(tempLine, "Sodium")){
+        	} 
+        	if (Fuzzy.containsOneOf(tempLine, "Sodium")){
         		data = "Sodium";
-        	} else if (Fuzzy.containsOneOf(tempLine, "Cholesterol")){
+        	} 
+        	if (Fuzzy.containsOneOf(tempLine, "Cholesterol")){
         		data = "Cholesterol";
-        	} else if (Fuzzy.containsOneOf(tempLine, "Sugars")){
+        	} 
+        	if (Fuzzy.containsOneOf(tempLine, "Sugars")){
         		data = "Sugars";
-        	} else if (Fuzzy.containsOneOf(tempLine, "Fiber")){
+        	} 
+        	if (Fuzzy.containsOneOf(tempLine, "Fiber")){
         		data = "Fiber";
-        	} else if (Fuzzy.containsOneOf(tempLine, "Potassium")){
+        	} 
+        	if (Fuzzy.containsOneOf(tempLine, "Potassium")){
         		data = "Potassium";
         	}
-        	if(data.length() > 0) {
-        		if(t.get(data) == null) {
+        	
+        	if(data.length() > 0) { 											//checks that the key is not empty
         			t.put(data, quantityArray);
-        		}
-        		else {
-        			t.put(data + count, quantityArray);
-        		}
         	}
         }
         return t;
     }
+	/**
+	 * Calculates the daily calorie intake needed based on a person's profile.
+	 * 
+	 * @param gender
+	 * @param exerciseAmount
+	 * @param weight
+	 * @param height
+	 * @param age
+	 * @return calories needed
+	 */
     public int dailyCalories(String gender, double exerciseAmount, double weight, double height, int age){
         int bmr = 0;
         if(gender.equals("Male")){
@@ -93,6 +105,10 @@ public class AnalyzeText {
         }
         return bmr;
     }
+    
+    /**
+     * testing fuzzyregex with the map.
+     */
     public static void main(String[] args){
     	TreeMap<String, String[]> tree = AnalyzeText.nutritionDetails("test.txt");
     	for(Map.Entry<String, String[]> entry : tree.entrySet())
