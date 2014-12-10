@@ -1,4 +1,3 @@
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -13,8 +12,6 @@ public class AnalyzeText {
 	public static TreeMap<String, String[]> nutritionDetails(String s){
 		
 		int count = 0;
-
-		//Fuzzy fuzzChecker = new Fuzzy();
 		
         TreeMap<String, String[]> t = new TreeMap<String, String[]>();
         
@@ -27,14 +24,27 @@ public class AnalyzeText {
             
             String tempLine = TextIO.getln();
             
-            Pattern p = Pattern.compile("\\d+");
-            Matcher m = p.matcher(tempLine);
-            while (m.find()) {
-            	quantity.add(m.group());
+            Pattern percentQuantities = Pattern.compile("\\d+%");
+            Matcher percentMatcher = percentQuantities.matcher(tempLine);
+            
+            Pattern gramsQuantity = Pattern.compile("\\d+(g|mg)");
+            Matcher gramsMatcher = gramsQuantity.matcher(tempLine);
+            
+            Pattern calorieCounter = Pattern.compile("Cal.*\\s\\d+");
+            Matcher calorieMatcher = calorieCounter.matcher(tempLine);
+            
+            while (percentMatcher.find()) {
+            	quantity.add(percentMatcher.group());
             }
             
-//            String[] quantityArray = {"a","b", "c"};
+            while (gramsMatcher.find()) {
+            	quantity.add(gramsMatcher.group());
+            }
             
+            while(calorieMatcher.find()) {
+            	quantity.add(calorieMatcher.group());
+            }
+           
             String[] quantityArray = new String[quantity.size()];
             for(int i= 0; i < quantityArray.length; i ++) {
             	quantityArray[i] = quantity.get(i);
